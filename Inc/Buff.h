@@ -23,11 +23,12 @@ using namespace cv;
 #define NO_TARGET -1
 #define MAX_NUM 921600
 
-const string lenet_model_file = "/home/yons/CLionProjects/HDU_Buff/lenet/lenet_iter_80000加了负样本.caffemodel";
-const string lenet_txt_file = "/home/yons/CLionProjects/HDU_Buff/lenet/deploy.prototxt";
+const string lenet_model_file = "/home/qianchen/CLionProjects/HDU_buff/lenet/lenet_iter_80000加了负样本.caffemodel";
+const string lenet_txt_file = "/home/qianchen/CLionProjects/HDU_buff/lenet/deploy.prototxt";
 
 //#define GET_ROI
 
+//用于选择我方的颜色
 enum detectMode {
     RED_ANCLOCK = 3,
     BLUE_ANCLOCK = 4,
@@ -37,8 +38,9 @@ enum detectMode {
     BLUE_STATIC = 8
 };
 
-
+//主类
 class Detect {
+    //二值化模式
     enum binaryMode {
         BGR = 1,
         HSV = 2,
@@ -48,7 +50,6 @@ class Detect {
         YCrCb = 6,
         LUV = 7,
     };
-
     enum predictMode {
         FIT_CIRCLE = 1,
         PUSH_CIRCLE = 2,
@@ -128,7 +129,7 @@ private:
     // param
     DectParam param;
     switchParam sParam;
-    vector<Point2f> fan_armorCenters;
+    vector<Point2f> fan_armorCenters; // 用来拟合椭圆的装甲板点集
 
     // init
     int mode= BLUE_CLOCK;
@@ -165,7 +166,7 @@ public:
     bool getFan_lenet(vector<vector<Point> >& armorContours, vector<int>& conIndexs, size_t& i, Mat& roi, Rect& rect);    //lenet判断 返回false则继续下一个轮廓
     bool getArmor(vector<vector<Point> >& final_contours, size_t& i, bool& findFlag, RotatedRect& final_squa, Point2f offset); //返回最后旋转矩阵final_squa
 
-    bool getArmorCenter_new(const cv::Mat src, const int bMode,armorData &data ,cv::Point2f offset = cv::Point2f(0, 0));
+    bool getArmorCenter_new(const cv::Mat src, const int bMode,armorData &data ,cv::Point2f offset = cv::Point2f(0, 0),const int classiMode=1);
     void detect_new(const Mat frame);
 };
 

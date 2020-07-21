@@ -4,8 +4,8 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/yons/CLionProjects/HDU_Buff/Src/Buff.cpp" "/home/yons/CLionProjects/HDU_Buff/cmake-build-debug/CMakeFiles/HDU_Buff.dir/Src/Buff.cpp.o"
-  "/home/yons/CLionProjects/HDU_Buff/main.cpp" "/home/yons/CLionProjects/HDU_Buff/cmake-build-debug/CMakeFiles/HDU_Buff.dir/main.cpp.o"
+  "/home/qianchen/CLionProjects/HDU_buff/Src/Buff.cpp" "/home/qianchen/CLionProjects/HDU_buff/cmake-build-debug/CMakeFiles/HDU_Buff.dir/Src/Buff.cpp.o"
+  "/home/qianchen/CLionProjects/HDU_buff/main.cpp" "/home/qianchen/CLionProjects/HDU_buff/cmake-build-debug/CMakeFiles/HDU_Buff.dir/main.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 

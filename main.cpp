@@ -6,7 +6,7 @@ using namespace cv;
 
 int main() {
     VideoCapture wind_video;
-    wind_video.open("/home/yons/CLionProjects/HDU_Buff/wind.mp4");
+    wind_video.open("/home/qianchen/CLionProjects/HDU_buff/wind.mp4");
     Detect detect;
     Mat srcimg;
     Point2f center(0,0);
@@ -14,6 +14,8 @@ int main() {
 
 
     Point2f offset_tmp;
+
+    if(!wind_video.isOpened()) return false;
 
     while (1)
     {
@@ -23,7 +25,7 @@ int main() {
         //detect.getArmorCenter_new(srcimg,3,detect.,offset_tmp);
         detect.detect_new(srcimg);
 //        cout<<"侦测到的符文中心为: "<<center<<endl;
-        waitKey();
+        waitKey(10);
     }
     return 0;
 }

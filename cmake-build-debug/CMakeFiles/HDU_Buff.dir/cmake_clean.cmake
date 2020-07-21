@@ -1,8 +1,8 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/HDU_Buff.dir/main.cpp.o"
   "CMakeFiles/HDU_Buff.dir/Src/Buff.cpp.o"
-  "HDU_Buff.pdb"
+  "CMakeFiles/HDU_Buff.dir/main.cpp.o"
   "HDU_Buff"
+  "HDU_Buff.pdb"
 )
 
 # Per-language clean rules from dependency scanning.
