@@ -34,11 +34,9 @@ mutex
 string.h
 -
 
-/home/qianchen/CLionProjects/HDU_buff/main.cpp
-iostream
--
+/home/qianchen/CLionProjects/HDU_buff/Src/Buff.cpp
 Buff.h
-/home/qianchen/CLionProjects/HDU_buff/Buff.h
+/home/qianchen/CLionProjects/HDU_buff/Src/Buff.h
 
 /usr/local/include/opencv4/opencv2/calib3d.hpp
 opencv2/core.hpp

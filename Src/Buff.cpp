@@ -819,6 +819,11 @@ enum classiMode {
 /// \param bMode 二值方法
 /// \param data 装甲板信息
 /// \param offset ROI的偏移
+
+static float radius_sum=0;
+static int radius_num=0;
+static int center_index = 0; // 用于表示所找到的装甲板中心的下标（个数）
+
 bool Detect::getArmorCenter_new(const Mat src, const int bMode, armorData &data, Point2f offset, const int classiMode) {
     /********************************* 二值化 ************************************/
     Mat binary;
@@ -872,12 +877,14 @@ bool Detect::getArmorCenter_new(const Mat src, const int bMode, armorData &data,
      * */
 
     Point2f center;
-    //drawContours(src,armorContours,0,Scalar(0,255,0));
-    static int center_index = 0; // 用于表示所找到的装甲板中心的下标（个数）
+
+
     int hammerToFall;//用于统计本帧中是否存在锤子
     if (classiMode==mySonNum) {
         for (size_t i = 0; i < armorContours_size; ++i)// 遍历每个轮廓
         {
+            // drawContours(src,armorContours,i,Scalar(0,255,0));
+
             double contour_area = contourArea(armorContours[i]);
             if (contour_area < 2000) continue; // 如果面积太小了，那就直接不管了
 
@@ -886,6 +893,7 @@ bool Detect::getArmorCenter_new(const Mat src, const int bMode, armorData &data,
                 hammerToFall++;
 
                 int son = armorHierarchy[i][2];//子轮廓的ID
+                //cout<<"son "<<i<<": "<<son<<endl;
 
                 //调试
                 if ((son != -1) && (armorContours[son].size() > 2))//子轮廓ID不为-1，并且该轮廓点集数目必须大于2(才可以获得外接矩形)
@@ -903,19 +911,34 @@ bool Detect::getArmorCenter_new(const Mat src, const int bMode, armorData &data,
 
                 //将找到的点放入点集中为后面拟合椭圆做准备
                 if (data.armorCenter != Point2f(0, 0)) {
-                    if (fan_armorCenters.size() < 50) {
+                    if (fan_armorCenters.size() < 200) {
                         fan_armorCenters.push_back(data.armorCenter);
-                    } else if (fan_armorCenters.size() >= 50) {
-                        if (center_index == 50)center_index = 0;
+                    } else if (fan_armorCenters.size() >= 200) {
+                        if (center_index == 200)
+                        {
+                            center_index = 0;
+                            radius_sum=0;
+                            radius_num=0;
+                        }
                         fan_armorCenters[center_index] = data.armorCenter;
                         center_index++;
+                        //cout<<"center_index:"<<center_index<<endl;
+
                     }
                 }
+                else
+                {
+                    //圆拟合数据重置
+                    fan_armorCenters.clear();
+                    radius_sum=0;
+                    radius_num=0;
+                }
+                cout<<"size:"<<fan_armorCenters.size()<<endl;
 
             } else if (findCount[i] > 2)//子轮廓>2，有可能是六边形
             {
-                /*//用来画六边形的轮廓
-                drawContours(src,armorContours,i,Scalar(0,255,0));*/
+                /*//用来画六边形的轮廓*/
+                drawContours(src,armorContours,i,Scalar(0,255,0));
                 RotatedRect FatherRect = minAreaRect(armorContours[i]);//有可能是六边形的轮廓
                 if (FatherRect.size.width * FatherRect.size.height < 5000) continue;//六边形外接矩形面积不能太小
 
@@ -924,9 +947,9 @@ bool Detect::getArmorCenter_new(const Mat src, const int bMode, armorData &data,
                 int final_son = armorHierarchy[i][2];
                 //把所有子轮廓找到，然后把其下标放入sons
                 while (final_son != -1) {
-                    /*//画出所有子轮廓
+                    //画出所有子轮廓
                     cout<<"final_son:"<<final_son<<endl;
-                    drawContours(src,armorContours,final_son,Scalar(0,255,255));*/
+                    drawContours(src,armorContours,final_son,Scalar(0,255,255));
 
                     //子轮廓都放入sons中
                     sons.push_back(final_son);
@@ -984,16 +1007,22 @@ bool Detect::getArmorCenter_new(const Mat src, const int bMode, armorData &data,
 
                 //利用子轮廓的长宽比（过于简单）来区分装甲板和其他两个扁长的矩形
                 for (int j = 0; j < Sons_whratio.size(); j++) {
-                    if ((Sons_whratio[j] > 1) && (Sons_whratio[j] < 2.5)) {
-                        if (fan_armorCenters.size() < 50) {
+                    if ((Sons_whratio[j] > 1) && (Sons_whratio[j] < 2.5)&&((SonsRect[j].center+offset)!=Point2f(0, 0))) {
+                        if (fan_armorCenters.size() < 200) {
                             fan_armorCenters.push_back(SonsRect[j].center + offset);
-                        } else if (fan_armorCenters.size() >= 50) {
-                            if (center_index == 50)center_index = 0;
+                        } else if (fan_armorCenters.size() >= 200) {
+                            if (center_index == 200)
+                            {
+                                center_index = 0;
+                                radius_sum=0;
+                                radius_num=0;
+                            }
                             fan_armorCenters[center_index] = SonsRect[j].center + offset;
                             center_index++;
                         }
 
                     }
+
 
                 }
 
@@ -1016,8 +1045,23 @@ bool Detect::getArmorCenter_new(const Mat src, const int bMode, armorData &data,
 
 
     /*********************拟合圆************************/
-    float radius;
-    circleLeastFit(fan_armorCenters, data.R_center, radius);
+    //static float radius_sum;
+    //static int radius_num;
+    float radius_temp=0.0;
+    circleLeastFit(fan_armorCenters, data.R_center, radius_temp);
+
+    if(radius_temp>0.0)
+    {
+        radius_sum+=radius_temp;
+        radius_num++;
+    }
+
+    const float radius=radius_sum/radius_num;
+
+//    cout<<"radius_sum"<<radius_sum<<endl;
+//    cout<<"radius_num"<<radius_num<<endl;
+//    cout<<"radius_temp"<<radius_temp<<endl;
+//    cout<<radius<<endl;
 
     /*for(int j=0;j<fan_armorCenters.size();j++)
         cout<<"fan_armorCenters"<<fan_armorCenters[j]<<" ";
@@ -1025,8 +1069,9 @@ bool Detect::getArmorCenter_new(const Mat src, const int bMode, armorData &data,
     cout<<"last_center"<<lastData.armorCenter;*/
     if (sParam.debug) {
         circle(src, data.armorCenter, 5, Scalar(255, 255, 255), 2);
-        circle(src, lastData.R_center, 5, Scalar(255, 255, 255), 2);
-        circle(src, lastData.R_center, radius, Scalar(20, 100, 100), 2);
+        circle(src, lastData.R_center, 5, Scalar(0, 255, 255), 2);
+        if(radius>0)
+            circle(src, lastData.R_center, radius, Scalar(20, 100, 100), 2);
     }
 
     imshow("father_son", src);

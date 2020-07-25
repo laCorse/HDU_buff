@@ -110,7 +110,7 @@ class Detect {
             pMode = TANGENT;
             // getArmorCenter
             element = getStructuringElement(cv::MORPH_RECT, cv::Size(9, 9));
-            noise_point_area = 800;//200
+            noise_point_area = 200;//200
             flabellum_area_min = 2000;// standard:7000
             flabellum_whrio_min = 1.5;
             flabellum_whrio_max = 2.7;//standard:2
@@ -132,7 +132,7 @@ private:
     vector<Point2f> fan_armorCenters; // 用来拟合椭圆的装甲板点集
 
     // init
-    int mode= BLUE_CLOCK;
+    int mode= RED_CLOCK;
     Mat debug_src;
     armorData lastData;
     armorData lostData;
